@@ -27,3 +27,6 @@ Temporary Items
 
 #Custom
 var.py
+key.json
+event.log
+synced_events.json
