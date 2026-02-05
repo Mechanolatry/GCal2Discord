@@ -15,8 +15,6 @@ DISCORD_CHANNEL_ID = 'YOUR_CHANNEL_ID'
 # Voice Channel Events will use the DISCORD_CHANNEL_ID above
 # External Events will not be tied to any specific Discord channel
 
-
-
 # Synchronization interval in seconds
 SYNC_INTERVAL = 600
 # Number of days in the future to fetch events
@@ -28,6 +26,16 @@ DAYS_IN_FUTURE = 10
 TIMEZONE = 'America/New_York'
 
 # Event filtering configuration (optional)
+
+# Free text search terms to find events that match these terms in the following google eventfields: 
+# summary, description, location, attendee's displayName, attendee's email, organizer's displayName, organizer's email. 
+# Use to restrict which events are fetched from google calendar. Leave blank to fetch all events.
+GOOGLE_FREETEXT_QUERY_STRING = '' 
+
+
+# Filtering configuration for events to sync to Discord. (optional)
+# Works in conjunction with GOOGLE_FREETEXT_QUERY_STRING.
+# If both are defined, an event must match the free text search term AND at least one of the filters below to be synced.
 # If EVENT_FILTERS is not defined or is empty, all events will be synced
 # If filters are defined, only events matching at least one filter will be synced
 EVENT_FILTERS = {

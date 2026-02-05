@@ -27,6 +27,21 @@ Temporary Items
 
 #Custom
 var.py
+synced_events.json
 key.json
 event.log
-synced_events.json
+
+# VS Code files
+.vscode/*
+
+# Local History for Visual Studio Code
+.history/
+
+# Built Visual Studio Code Extensions
+*.vsix
+
+# Python
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[codz]
+*$py.class
