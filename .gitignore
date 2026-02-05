@@ -25,11 +25,6 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-#Custom
-var.py
-synced_events.json
-key.json
-event.log
 
 # VS Code files
 .vscode/*
@@ -45,3 +40,10 @@ event.log
 __pycache__/
 *.py[codz]
 *$py.class
+
+# Application Related
+**/var.py
+**/synced_events.json
+**/key.json
+**/event.log
+nssm/*.log
