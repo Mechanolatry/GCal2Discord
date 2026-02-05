@@ -1,7 +1,7 @@
 # Variables for the Google Calendar and Discord synchronization script
 
 # Google API credentials
-GOOGLE_CREDENTIALS_JSON = '/your_path/key.json'
+GOOGLE_CREDENTIALS_JSON = './key.json'
 GOOGLE_CALENDAR_ID = 'INSERT_YOUR_GOOGLE_CALENDAR_ID@group.calendar.google.com'
 
 # Discord bot token and server/guild ID
@@ -9,9 +9,77 @@ DISCORD_BOT_TOKEN = 'YOUR_BOT_TOKEN'
 DISCORD_GUILD_ID = 'YOUR_GUIILD_ID'
 DISCORD_CHANNEL_ID = 'YOUR_CHANNEL_ID'
 
-
+# Event Type Behavior:
+# - Events with location containing "discord" (case-insensitive) = Voice Channel Events
+# - All other events = External Events
+# Voice Channel Events will use the DISCORD_CHANNEL_ID above
+# External Events will not be tied to any specific Discord channel
 
 # Synchronization interval in seconds
 SYNC_INTERVAL = 600
 # Number of days in the future to fetch events
 DAYS_IN_FUTURE = 10
+    
+# Default timezone for all-day events (important for daylight savings time)
+# Use IANA timezone names like: 'America/New_York', 'Europe/London', 'America/Los_Angeles'
+# This timezone will be used for all-day events to determine proper DST offset
+TIMEZONE = 'America/New_York'
+
+# Event filtering configuration (optional)
+
+# Free text search terms to find events that match these terms in the following google eventfields: 
+# summary, description, location, attendee's displayName, attendee's email, organizer's displayName, organizer's email. 
+# Use to restrict which events are fetched from google calendar. Leave blank to fetch all events.
+GOOGLE_FREETEXT_QUERY_STRING = '' 
+
+
+# Filtering configuration for events to sync to Discord. (optional)
+# Works in conjunction with GOOGLE_FREETEXT_QUERY_STRING.
+# If both are defined, an event must match the free text search term AND at least one of the filters below to be synced.
+# If EVENT_FILTERS is not defined or is empty, all events will be synced
+# If filters are defined, only events matching at least one filter will be synced
+EVENT_FILTERS = {
+    # Sync events whose title contains any of these keywords
+    'title_contains': ['meeting', 'discord', 'stream', 'raid'],
+    
+    # Sync events whose title starts with any of these prefixes
+    'title_starts_with': ['[IMPORTANT]', 'Guild:', 'Event:'],
+    
+    # Sync events whose title ends with any of these suffixes
+    'title_ends_with': [' - Discord Event', ' (Public)'],
+    
+    # Sync events whose description contains any of these keywords
+    'description_contains': ['discord', 'public event', 'community'],
+    
+    # Sync events whose location contains any of these keywords
+    'location_contains': ['discord', 'online', 'virtual'],
+    
+    # Sync events created by any of these email addresses
+    'creator_email': ['admin@yourdomain.com', 'events@yourdomain.com'],
+    
+    # Sync events that have any of these attendees
+    'attendee_email': ['community@yourdomain.com'],
+    
+    # Exclude events whose title contains any of these keywords (takes precedence)
+    'exclude_title_contains': ['private', 'internal', 'personal'],
+    
+    # Exclude events whose description contains any of these keywords (takes precedence)
+    'exclude_description_contains': ['do not sync', 'private meeting']
+}
+
+# Alternative simple filter examples:
+# 
+# Only sync events with "Discord" in the title:
+# EVENT_FILTERS = {
+#     'title_contains': ['discord']
+# }
+#
+# Only sync events starting with specific prefixes:
+# EVENT_FILTERS = {
+#     'title_starts_with': ['[PUBLIC]', 'Community:', 'Event:']
+# }
+#
+# Sync all events except private ones:
+# EVENT_FILTERS = {
+#     'exclude_title_contains': ['private', 'personal']
+# }
