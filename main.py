@@ -351,6 +351,7 @@ def get_upcoming_events(service):
 def get_discord_events():
     """
     Fetch existing scheduled events from the Discord server.
+    Returns the events list on success, or None on failure.
     """
     log_event("Requesting events from Discord.")
     url = f"https://discord.com/api/v9/guilds/{var.DISCORD_GUILD_ID}/scheduled-events"
@@ -362,7 +363,7 @@ def get_discord_events():
         return response.json()
     else:
         log_event(f"Failed to fetch Discord events: {response.content}")
-        return []
+        return None
 
 def create_or_update_discord_event(event, discord_event_id=None):
     """
@@ -524,6 +525,11 @@ async def sync_events_loop():
         events = get_upcoming_events(service)
         discord_events = get_discord_events()
         global synced_events
+
+        # Check if Discord events fetch failed - abort this sync cycle if so
+        if discord_events is None:
+            log_event("Discord events fetch failed due to connection error. Aborting current sync cycle to prevent duplicate entries. Will retry on next scheduled cycle.")
+            return
 
         # Filter events based on configured criteria
         filtered_events = [event for event in events if should_sync_event(event)]
