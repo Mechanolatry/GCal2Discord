@@ -128,15 +128,25 @@ def should_sync_event(event):
     # If we have filters but none matched, don't sync the event
     return False
 
-def parse_html_links(text):
+def clean_html_content(text):
     """
-    Parse HTML anchor tags in text and convert them to plain text format.
-    Converts: <a href="https://example.com">Link Text</a>
-    To: https://example.com (Link Text)
+    Parse HTML content and convert it to plain text format.
+    Converts:
+    - <a href="https://example.com">Link Text</a> to: https://example.com (Link Text)
+    - <br> and <br/> tags to newlines
+    - HTML entities to their text equivalents
+    - Removes all other HTML tags
     """
-   
+    import html
+    
     if not text:
         return text
+    
+    # First, convert HTML entities to their text equivalents (e.g., &amp; to &)
+    converted_text = html.unescape(text)
+    
+    # Replace <br> and <br/> tags with newlines
+    converted_text = re.sub(r'<br\s*/?>', '\n', converted_text, flags=re.IGNORECASE)
     
     # Regular expression to match HTML anchor tags
     # Matches: <a href="URL">TEXT</a>
@@ -148,7 +158,16 @@ def parse_html_links(text):
         return f"{url} ({link_text})"
     
     # Replace all HTML links with the new format
-    converted_text = re.sub(link_pattern, replace_link, text, flags=re.IGNORECASE)
+    converted_text = re.sub(link_pattern, replace_link, converted_text, flags=re.IGNORECASE)
+    
+    # Remove any remaining HTML tags
+    converted_text = re.sub(r'<[^>]+>', '', converted_text)
+    
+    # Clean up multiple consecutive newlines (replace with maximum 2)
+    converted_text = re.sub(r'\n{3,}', '\n\n', converted_text)
+    
+    # Strip leading and trailing whitespace
+    converted_text = converted_text.strip()
     
     return converted_text
 
@@ -245,7 +264,7 @@ def get_event_signature(event):
     
     signature = {
         'title': event.get('summary', ''),
-        'description': parse_html_links(event.get('description', '')),
+        'description': clean_html_content(event.get('description', '')),
         'start_time': start_time,
         'end_time': end_time,
         'location': event.get('location', ''),
@@ -377,7 +396,7 @@ def create_or_update_discord_event(event, discord_event_id=None):
     
     data = {
         "name": event['summary'],
-        "description": parse_html_links(event.get('description', '')),
+        "description": clean_html_content(event.get('description', '')),
         "scheduled_start_time": start_time,
         "scheduled_end_time": end_time,
         "privacy_level": 2,
