@@ -410,8 +410,11 @@ def create_or_update_discord_event(event, discord_event_id=None):
         data["channel_id"] = var.DISCORD_CHANNEL_ID
     else:
         # External event - requires entity_metadata with location
+        location = event.get('location', 'External Event')
+        # Truncate location to Discord's 100-character limit
+        location = location[:100] if location else 'External Event'
         data["entity_metadata"] = {
-            "location": event.get('location', 'External Event')
+            "location": location
         }
 
     response = method(url, json=data, headers=headers)
